@@ -18,7 +18,6 @@ function createBulkPDFs() {
   data.forEach(row => {
     try {
       pdfLink = createPDF(row[0], row[1], row[3], row[0] + " " + row[1], docFile, tempFolder, pdfFolder);
-      //console.log(pdfLink);
       errors.push(pdfLink);
     } catch { errors.push(["PDF Failed"]); }
   }) // end of forEach
@@ -31,7 +30,6 @@ function createBulkPDFs() {
 function createPDF(firstName, lastName, balanceAmount, pdfName, docFile, tempFolder, pdfFolder) {
 
   const tempFile = docFile.makeCopy(tempFolder).setName("tempFile");
-
   const tempDocFile = DocumentApp.openById(tempFile.getId());
   const body = tempDocFile.getBody();
 
