@@ -9,21 +9,22 @@ function createBulkPDFs() {
   const pdfFolder = DriveApp.getFolderById(pdfFolderID);
   const docFile = DriveApp.getFileById(templateID);
 
-  const ws = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('People');
+  const workSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('People');
+  const data = workSheet.getDataRange().getDisplayValues().slice(1);
 
-  const data = ws.getDataRange().getDisplayValues().slice(1);
-  let errors = new Array();
-  
+  var pdfLink = "";
+  let errors = [];  
+
   data.forEach(row => {
     try {
-      createPDF(row[0], row[1], row[3], row[0] + " " + row[1], docFile, tempFolder, pdfFolder);
-      errors.push(["PDF Created"]);
-    }
-    catch { error.push(["PDF Failed"]); }
+      pdfLink = createPDF(row[0], row[1], row[3], row[0] + " " + row[1], docFile, tempFolder, pdfFolder);
+      //console.log(pdfLink);
+      errors.push(pdfLink);
+    } catch { errors.push(["PDF Failed"]); }
   }) // end of forEach
 
-  ws.getRange(2,5,ws.getLastRow()-1,1).setValue(errors);
-
+  for (var i=0; i<workSheet.getLastRow()-1; i++) { workSheet.getRange(i+2,5).setValue(errors[i]); }
+  
 } // end of createBulkPDFs()
 
 
@@ -40,7 +41,8 @@ function createPDF(firstName, lastName, balanceAmount, pdfName, docFile, tempFol
   tempDocFile.saveAndClose();
 
   const pdfBlob = tempDocFile.getAs('application/pdf');
-  pdfFolder.createFile(pdfBlob).setName(pdfName);
-  tempFile.setTrashed(true);
+  const pdf = pdfFolder.createFile(pdfBlob).setName(pdfName).setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  var pdfLink = "https://drive.google.com/uc?export=view&id=" + pdf.getId();
+  tempFile.setTrashed(true); return pdfLink;
 
 } // end of do createPDF()
