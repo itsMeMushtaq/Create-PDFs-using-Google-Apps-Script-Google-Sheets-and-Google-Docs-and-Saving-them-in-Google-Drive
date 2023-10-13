@@ -1,3 +1,10 @@
+function onOpen() { 
+  let ui = SpreadsheetApp.getUi();
+  ui.createMenu("myMenu")
+    .addItem("Create Bulk PDFs","createBulkPDFs")
+    .addToUi();
+} // end of onOpen
+
 function createBulkPDFs() {
 
   const sheetID = "GOOGLE_SHEET_ID_HERE";
@@ -23,6 +30,8 @@ function createBulkPDFs() {
   }) // end of forEach
 
   for (var i=0; i<workSheet.getLastRow()-1; i++) { workSheet.getRange(i+2,5).setValue(errors[i]); }
+
+  SpreadsheetApp.getUi().alert("Congratulations!","PDF Files are created successfully!!!",SpreadsheetApp.getUi().ButtonSet.OK);
   
 } // end of createBulkPDFs()
 
@@ -30,6 +39,7 @@ function createBulkPDFs() {
 function createPDF(firstName, lastName, balanceAmount, pdfName, docFile, tempFolder, pdfFolder) {
 
   const tempFile = docFile.makeCopy(tempFolder).setName("tempFile");
+
   const tempDocFile = DocumentApp.openById(tempFile.getId());
   const body = tempDocFile.getBody();
 
